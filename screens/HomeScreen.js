@@ -60,12 +60,16 @@ const HotelHomeScreen = () => {
     navigation.navigate('ReservationListScreen');
   };
 
+    const navigateToMainMenu = () => {
+        navigation.navigate('MainMenu');
+    };
+
   return (
     <View style={styles.container}>
       <View style={styles.topMenu}>
-        <TouchableOpacity onPress={navigateToFilterScreen} style={styles.filterButton}>
-          <Icon name="filter" size={20} color="white" />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
+              <Text style={styles.buttonText}>Main Menu</Text>
+          </TouchableOpacity>
         <View style={styles.searchContainer}>
           <Icon name="search" size={20} color="white" style={styles.searchIcon} />
           <TextInput
@@ -77,32 +81,47 @@ const HotelHomeScreen = () => {
         </View>
       </View>
 
-      <ScrollView style={styles.hotelList}>
-        {filteredHotels.length === 0 ? (
-          <Text style={styles.searchResultsText}>No hotel found.</Text>
-        ) : (
-          filteredHotels.map((hotel) => (
-            <TouchableOpacity
-              key={hotel.id}
-              style={styles.hotelContainer}
-              onPress={() => navigateToDetails(hotel)}
-            >
-              <Image source={{ uri: hotel.image }} style={styles.hotelImage} />
-              <View style={styles.hotelInfo}>
-                <Text style={styles.hotelName}>{hotel.name}</Text>
-                <Text style={styles.hotelDescription}>{hotel.description}</Text>
-                <Text style={styles.hotelDescription}>City: {hotel.location}</Text>
-                {hotel.averageRating && (
-                  <Text style={styles.hotelAvgRating}>
-                    Rating: {hotel.averageRating.toFixed(1)} ☆
-                  </Text>
-                )}
-                <Text style={styles.hotelNumRatings}>{hotel.numRatings}</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
+        <ScrollView style={styles.hotelList}>
+            {filteredHotels.length === 0 ? (
+                <View style={styles.noHotelContainer}>
+                    {/*  4 Beispiel Hotels */}
+                    {[1, 2, 3, 4].map((index) => (
+                        <TouchableOpacity key={index} style={styles.hotelContainer}>
+                            <Image
+                                source={{ uri: 'URL des Bildes hier einfügen' }}
+                                style={styles.hotelImage}
+                            />
+                            <View style={styles.hotelInfo}>
+                                <Text style={styles.hotelName}>Hotel {index}</Text>
+                                <Text style={styles.hotelDescription}>Description of Hotel {index}</Text>
+                                <Text style={styles.hotelDescription}>City: City {index}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            ) : (
+                filteredHotels.map((hotel) => (
+                    <TouchableOpacity
+                        key={hotel.id}
+                        style={styles.hotelContainer}
+                        onPress={() => navigateToDetails(hotel)}
+                    >
+                        <Image source={{ uri: hotel.image }} style={styles.hotelImage} />
+                        <View style={styles.hotelInfo}>
+                            <Text style={styles.hotelName}>{hotel.name}</Text>
+                            <Text style={styles.hotelDescription}>{hotel.description}</Text>
+                            <Text style={styles.hotelDescription}>City: {hotel.location}</Text>
+                            {hotel.averageRating && (
+                                <Text style={styles.hotelAvgRating}>
+                                    Rating: {hotel.averageRating.toFixed(1)} ☆
+                                </Text>
+                            )}
+                            <Text style={styles.hotelNumRatings}>{hotel.numRatings}</Text>
+                        </View>
+                    </TouchableOpacity>
+                ))
+            )}
+        </ScrollView>
 
       <View style={styles.bottomMenu}>
         <TouchableOpacity style={styles.reservationButton} onPress={navigateToReservationListScreen}>
@@ -156,7 +175,6 @@ const styles = StyleSheet.create({
     hotelContainer: {
       flexDirection: 'row',
       marginBottom: 20,
-      backgroundColor: 'blue', // Ändern Sie die Hintergrundfarbe entsprechend
       borderRadius: 10,
       padding: 10,
     },
@@ -206,4 +224,3 @@ const styles = StyleSheet.create({
       padding: 10,
     },
   });
-  

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from "./screens/HomeScreen";
 import HotelHomeScreen from './screens/HomeScreen';
+import MainMenuScreen from "./screens/MainMenuScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -12,29 +13,25 @@ console.disableYellowBox=true;
 console.error = () => {};
 
 export default function App() {
-  return(
-    <NavigationContainer>
-      <Stack.Navigator>
-      <Stack.Screen
-          options={{ headerTitle: "", headerBackVisible: false }}
-          name="Login"
-          component={LoginScreen}
-        />
-        <Stack.Screen
-          options={{ headerTitle: "", headerBackVisible: false }}
-          name="Home"
-          component={HotelHomeScreen}
-          />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    return (
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen
+                    options={{ headerTitle: "", headerBackVisible: false }}
+                    name="Login"
+                    component={LoginScreen}
+                />
+                <Stack.Screen
+                    options={{ headerTitle: "", headerBackVisible: false }}
+                    name="Home"
+                    component={HotelHomeScreen}
+                />
+                <Stack.Screen
+                    options={{ headerTitle: "", headerBackVisible: false }}
+                    name="MainMenu" // Add Main Menu Screen to the navigator
+                    component={MainMenuScreen}
+                />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+}
