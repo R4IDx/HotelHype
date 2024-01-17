@@ -17,7 +17,9 @@
     "install": "^0.13.0",
     "npm": "^10.3.0",
     "react": "18.2.0",
-    "react-native": "0.72.6"
+    "react-native": "0.72.6",
+    "react-native-maps": "1.7.1",
+    "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

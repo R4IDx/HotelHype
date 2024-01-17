@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from "./screens/HomeScreen";
 import HotelHomeScreen from './screens/HomeScreen';
 import MainMenuScreen from "./screens/MainMenuScreen";
+import MapScreen from "./screens/Map";
 
 
 const Stack = createNativeStackNavigator();
@@ -24,8 +25,13 @@ export default function App() {
                 <Stack.Screen
                     options={{ headerTitle: "", headerBackVisible: false }}
                     name="Home"
-                    component={HotelHomeScreen}
+                    component={HomeScreen}
                 />
+                <Stack.Screen
+                    options={{ headerTitle: "", headerBackVisible: false }}
+                    name="Map"
+                    component={MapScreen}
+                />    
                 <Stack.Screen
                     options={{ headerTitle: "", headerBackVisible: false }}
                     name="MainMenu" // Add Main Menu Screen to the navigator

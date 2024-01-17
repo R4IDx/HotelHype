@@ -14,8 +14,8 @@ const MainMenuScreen = ({ navigation }) => {
         // Aktion für Vergleich-Button
     };
 
-    const handleSettingsPress = () => {
-        // Aktion für Einstellungen-Button
+    const handleMapPress = () => {
+        navigation.navigate("Map");
     };
 
     const navigateToHome = () => {
@@ -23,11 +23,12 @@ const MainMenuScreen = ({ navigation }) => {
     };
 
     return (
+        
         <View style={styles.container}>
             {/* Logo Platzhalter */}
             <View style={styles.logoContainer}>
                 <Image
-                    //source={require('./path/to/your/logo.png')}
+                    source={require('../logo/Logo1.jpg')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
@@ -43,7 +44,7 @@ const MainMenuScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.menuButton} onPress={handleComparePress}>
                 <Text style={styles.buttonText}>Vergleich</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuButton} onPress={handleSettingsPress}>
+            <TouchableOpacity style={styles.menuButton} onPress={handleMapPress}>
                 <Text style={styles.buttonText}>Einstellungen</Text>
             </TouchableOpacity>
         </View>

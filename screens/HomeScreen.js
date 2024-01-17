@@ -4,6 +4,7 @@ import { firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+
 const HotelHomeScreen = () => {
   const navigation = useNavigation();
   const [hotels, setHotels] = useState([]);
@@ -24,6 +25,10 @@ const HotelHomeScreen = () => {
       unsubscribe();
     };
   }, []);
+  
+  const handleMapPress = () => {
+    navigation.navigate("Map");
+};
 
   const navigateToFilterScreen = () => {
     navigation.navigate('FilterScreen', {
@@ -64,23 +69,30 @@ const HotelHomeScreen = () => {
         navigation.navigate('MainMenu');
     };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.topMenu}>
-          <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
-              <Text style={styles.buttonText}>Main Menu</Text>
-          </TouchableOpacity>
-        <View style={styles.searchContainer}>
-          <Icon name="search" size={20} color="white" style={styles.searchIcon} />
-          <TextInput
-            placeholder="Enter your location"
-            style={styles.searchInput}
-            value={filter}
-            onChangeText={(text) => setFilter(text)}
-          />
-        </View>
-      </View>
+    return (
+        <View style={styles.container}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={require('../logo/Logo1.jpg')}
+              style={styles.headerImage}
+            />
+          </View>
+    
 
+          <View style={styles.topMenu}>
+            <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
+            <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>Main Menu</Text>
+            </TouchableOpacity>
+            <View style={styles.searchContainer}>
+              <Icon name="search" size={20} color="white" style={styles.searchIcon} />
+              <TextInput
+                placeholder="Enter your location"
+                style={styles.searchInput}
+                value={filter}
+                onChangeText={(text) => setFilter(text)}
+              />
+            </View>
+          </View>
         <ScrollView style={styles.hotelList}>
             {filteredHotels.length === 0 ? (
                 <View style={styles.noHotelContainer}>
@@ -124,8 +136,8 @@ const HotelHomeScreen = () => {
         </ScrollView>
 
       <View style={styles.bottomMenu}>
-        <TouchableOpacity style={styles.reservationButton} onPress={navigateToReservationListScreen}>
-          <Icon name="calendar" size={20} color="white" />
+        <TouchableOpacity style={styles.reservationButton} onPress={handleMapPress}>
+          <Icon name="map" size={20} color="white" />
         </TouchableOpacity>
       </View>
     </View>
@@ -139,6 +151,19 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: 'white',
     },
+    imageContainer: {
+        height: 100, 
+        backgroundColor: 'blue',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      headerImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
+      },
+
+
     topMenu: {
       flexDirection: 'row',
       justifyContent: 'space-between',
