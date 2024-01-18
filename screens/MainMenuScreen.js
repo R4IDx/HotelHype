@@ -7,11 +7,11 @@ const MainMenuScreen = ({ navigation }) => {
     };
 
     const handleSavedPress = () => {
-        // Aktion für Gespeichert-Button
+        navigation.navigate("Saved");
     };
 
     const handleComparePress = () => {
-        // Aktion für Vergleich-Button
+        navigation.navigate("Compare");
     };
 
     const handleMapPress = () => {
@@ -45,7 +45,7 @@ const MainMenuScreen = ({ navigation }) => {
                 <Text style={styles.buttonText}>Vergleich</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuButton} onPress={handleMapPress}>
-                <Text style={styles.buttonText}>Einstellungen</Text>
+                <Text style={styles.buttonText}>Karte</Text>
             </TouchableOpacity>
         </View>
     );
