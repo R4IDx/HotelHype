@@ -8,9 +8,9 @@ import * as Location from 'expo-location';
 const MapScreen = () => {
   const navigation = useNavigation();
   const [location, setLocation] = useState(null);
+  const [city, setCity] = useState(null);
 
   useEffect(() => {
-    // Funktion, um die Standortinformationen zu erhalten
     const getLocationAsync = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -21,14 +21,45 @@ const MapScreen = () => {
 
         const currentLocation = await Location.getCurrentPositionAsync({});
         setLocation(currentLocation.coords);
+
+        // Hier den Städtenamen abrufen
+        const cityName = await getCityName(currentLocation.coords.latitude, currentLocation.coords.longitude);
+        setCity(cityName);
       } catch (error) {
         console.error('Error getting location:', error);
       }
     };
 
-    // Standortinformationen abrufen
     getLocationAsync();
   }, []);
+
+  const sendLocation = () => {
+    if (city) {
+      console.log('Standort übertragen:', city);
+    } else {
+      console.warn('Städtenamen nicht verfügbar');
+    }
+  };
+
+  const getCityName = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      );
+      const data = await response.json();
+
+      console.log('API-Antwort:', data); // Hinzugefügt, um die API-Antwort zu überprüfen
+
+      if (data && data.address && (data.address.city || data.address.village)) {
+        return data.address.city || data.address.village;
+      } else {
+        return 'Unbekannt';
+      }
+    } catch (error) {
+      console.error('Fehler beim Abrufen des Städtenamens:', error);
+      return 'Unbekannt';
+    }
+  };
 
   const navigateToMainMenu = () => {
     navigation.navigate('MainMenu');
@@ -51,8 +82,12 @@ const MapScreen = () => {
             </Text>
           </TouchableOpacity>
           <Text style={{ fontSize: 20, color: 'white' }}>Karte</Text>
+          <TouchableOpacity onPress={sendLocation} style={styles.menuButton}>
+            <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>
+              Standort übertragen
+            </Text>
+          </TouchableOpacity>
         </View>
-
         <View style={styles.contentContainer}>
           <View style={styles.mapContainer}>
             {location && (
@@ -65,7 +100,6 @@ const MapScreen = () => {
                       longitudeDelta: 0.0421,
                     }}
                 >
-                  {/* Marker setzen */}
                   <Marker
                       coordinate={{
                         latitude: location.latitude,
