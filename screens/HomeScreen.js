@@ -3,13 +3,12 @@ import { StyleSheet, Text, TouchableOpacity, View, TextInput, Image, ScrollView 
 import { firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import axios from 'axios';
 
 const HotelHomeScreen = () => {
   const navigation = useNavigation();
   const [hotels, setHotels] = useState([]);
   const [filter, setFilter] = useState('');
-  const [sortBy, setSortBy] = useState('');
   const [filteredHotels, setFilteredHotels] = useState([]);
 
   useEffect(() => {
@@ -25,115 +24,85 @@ const HotelHomeScreen = () => {
       unsubscribe();
     };
   }, []);
-  
+
+  const searchHotelsByCity = async (cityName) => {
+    try {
+      const response = await axios.get(`https://api.makcorps.com/free/${cityName}`, {
+        headers: {
+          'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MTc2NzczNjAsImlkZW50aXR5IjozLCJuYmYiOjE1MTc2NzczNjAsImV4cCI6MTUxNzY3OTE2MH0.ytSqQj3VDymEaJz9EIdskWELwDQZRD1Dbo6TuHaPz9U'
+        },
+      });
+
+      const hotelsData = response.data.hotels;
+      setFilteredHotels(hotelsData);  // Update filteredHotels instead of hotels
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleSearch = () => {
+    searchHotelsByCity(filter);
+  };
+
   const handleMapPress = () => {
     navigation.navigate("Map");
-};
-
-  const navigateToFilterScreen = () => {
-    navigation.navigate('FilterScreen', {
-      sortBy,
-      applyFilters: handleApplyFilters,
-    });
-  };
-
-  const handleApplyFilters = (sortBy) => {
-    setSortBy(sortBy);
-  };
-
-  useEffect(() => {
-    const filteredHotels = hotels.filter((h) =>
-      h.location.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    if (sortBy === 'rating-desc') {
-      filteredHotels.sort((a, b) => b.averageRating - a.averageRating);
-    } else if (sortBy === 'rating-asc') {
-      filteredHotels.sort((a, b) => a.averageRating - b.averageRating);
-    } else if (sortBy === 'alphabetical') {
-      filteredHotels.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    setFilteredHotels(filteredHotels);
-  }, [filter, hotels, sortBy]);
-
+  }; 
   const navigateToDetails = (hotel) => {
     navigation.navigate('HotelDetailsScreen', { hotel });
   };
 
-  const navigateToReservationListScreen = () => {
-    navigation.navigate('ReservationListScreen');
+  const navigateToMainMenu = () => {
+    navigation.navigate('MainMenu');
   };
 
-    const navigateToMainMenu = () => {
-        navigation.navigate('MainMenu');
-    };
+  return (
+    <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('../logo/Logo1.jpg')}
+          style={styles.headerImage}
+        />
+      </View>
 
-    return (
-        <View style={styles.container}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={require('../logo/Logo1.jpg')}
-              style={styles.headerImage}
-            />
-          </View>
-    
-
-          <View style={styles.topMenu}>
-            <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
-            <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>Main Menu</Text>
-            </TouchableOpacity>
-            <View style={styles.searchContainer}>
-              <Icon name="search" size={20} color="white" style={styles.searchIcon} />
-              <TextInput
-                placeholder="Enter your location"
-                style={styles.searchInput}
-                value={filter}
-                onChangeText={(text) => setFilter(text)}
-              />
+      <View style={styles.topMenu}>
+        <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
+          <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>Main Menu</Text>
+        </TouchableOpacity>
+        <View style={styles.searchContainer}>
+          <Icon name="search" size={20} color="white" style={styles.searchIcon} />
+          <TextInput
+            placeholder="Enter your Cityname"
+            style={styles.searchInput}
+            value={filter}
+            onChangeText={(text) => setFilter(text)}
+          />
+          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+            <Text style={styles.searchButtonText}>Search</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ScrollView style={styles.hotelList}>
+        {filteredHotels.map((hotel) => (
+          <TouchableOpacity
+            key={hotel.id}
+            style={styles.hotelContainer}
+            onPress={() => navigateToDetails(hotel)}
+          >
+            <Image source={{ uri: hotel.image }} style={styles.hotelImage} />
+            <View style={styles.hotelInfo}>
+              <Text style={styles.hotelName}>{hotel.name}</Text>
+              <Text style={styles.hotelDescription}>{hotel.description}</Text>
+              <Text style={styles.hotelDescription}>City: {hotel.location}</Text>
+              {hotel.averageRating && (
+                <Text style={styles.hotelAvgRating}>
+                  Rating: {hotel.averageRating.toFixed(1)} ☆
+                </Text>
+              )}
+              <Text style={styles.hotelNumRatings}>{hotel.numRatings}</Text>
             </View>
-          </View>
-        <ScrollView style={styles.hotelList}>
-            {filteredHotels.length === 0 ? (
-                <View style={styles.noHotelContainer}>
-                    {/*  4 Beispiel Hotels */}
-                    {[1, 2, 3, 4].map((index) => (
-                        <TouchableOpacity key={index} style={styles.hotelContainer}>
-                            <Image
-                                source={{ uri: 'URL des Bildes hier einfügen' }}
-                                style={styles.hotelImage}
-                            />
-                            <View style={styles.hotelInfo}>
-                                <Text style={styles.hotelName}>Hotel {index}</Text>
-                                <Text style={styles.hotelDescription}>Description of Hotel {index}</Text>
-                                <Text style={styles.hotelDescription}>City: City {index}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            ) : (
-                filteredHotels.map((hotel) => (
-                    <TouchableOpacity
-                        key={hotel.id}
-                        style={styles.hotelContainer}
-                        onPress={() => navigateToDetails(hotel)}
-                    >
-                        <Image source={{ uri: hotel.image }} style={styles.hotelImage} />
-                        <View style={styles.hotelInfo}>
-                            <Text style={styles.hotelName}>{hotel.name}</Text>
-                            <Text style={styles.hotelDescription}>{hotel.description}</Text>
-                            <Text style={styles.hotelDescription}>City: {hotel.location}</Text>
-                            {hotel.averageRating && (
-                                <Text style={styles.hotelAvgRating}>
-                                    Rating: {hotel.averageRating.toFixed(1)} ☆
-                                </Text>
-                            )}
-                            <Text style={styles.hotelNumRatings}>{hotel.numRatings}</Text>
-                        </View>
-                    </TouchableOpacity>
-                ))
-            )}
-        </ScrollView>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <View style={styles.bottomMenu}>
         <TouchableOpacity style={styles.reservationButton} onPress={handleMapPress}>
@@ -153,7 +122,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         height: 100, 
-        backgroundColor: 'blue',
+        backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
       },

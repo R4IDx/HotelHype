@@ -23,7 +23,6 @@ const MainMenuScreen = ({ navigation }) => {
     };
 
     return (
-        
         <View style={styles.container}>
             {/* Logo Platzhalter */}
             <View style={styles.logoContainer}>
