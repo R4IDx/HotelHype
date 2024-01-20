@@ -170,7 +170,7 @@ const HotelHomeScreen = () => {
             style={styles.hotelContainer}
             onPress={() => navigateToDetails(hotel)}
           >
-            <Image source={{ uri: hotel.images.hostThumbnail }} style={styles.hotelImage} />
+            <Image source={{ uri: hotel.images[0] }} style={styles.hotelImage} />
             <View style={styles.hotelInfo}>
               <Text style={styles.hotelName}>{hotel.name}</Text>
               <Text style={styles.hotelDescription}>{hotel.type}</Text>
@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
     },
     hotelContainer: {
       flexDirection: 'row',
+      alignItems: "center",
       marginBottom: 20,
       borderRadius: 10,
       padding: 10,
