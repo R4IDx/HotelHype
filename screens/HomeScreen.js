@@ -52,6 +52,37 @@ const HotelHomeScreen = () => {
     getLocationAsync();
   }, []);
 
+
+  const getCityName = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      );
+      const data = await response.json();
+  
+      console.log('API-Antwort:', data);
+  
+      let cityName;
+  
+      if (data && data.address && (data.address.city || data.address.village)) {
+        cityName = data.address.city || data.address.village;
+      } else if (data && data.address && data.address.county) {
+        // Extrahiere den Stadtnamen aus "Stadt Landkreis Reutlingen"
+        const countyParts = data.address.county.split(' ');
+        cityName = countyParts[countyParts.length - 1];
+      } else {
+        cityName = 'Unbekannt';
+      }
+  
+      console.log(cityName);
+      searchHotelsByCity(cityName);
+    } catch (error) {
+      console.error('Fehler beim Abrufen des Städtenamens:', error);
+      return 'Unbekannt';
+    }
+  };
+
+
   const sendLocation = async () => {
     try {
       await getLocationAsync();
@@ -59,7 +90,6 @@ const HotelHomeScreen = () => {
         console.log('Standort übertragen:', location);
         const cityName = await getCityName(location.latitude, location.longitude);
          console.log('Städtenamen:', cityName);
-        searchHotelsByCity(cityName);
       } else {
         console.warn('Standort nicht verfügbar');
       }
@@ -69,11 +99,12 @@ const HotelHomeScreen = () => {
   };
 
 
-  const searchHotelsByCity = async (Location) => {
+  const searchHotelsByCity = async (cityName) => {
+    console.log('Location:', cityName);
     try {
       const response = await axios.get('https://airbnb13.p.rapidapi.com/search-location', {
         params: {
-          location: Location,
+          location: cityName,
           checkin: '2024-01-20',
           checkout: '2024-01-21',
           adults: '1',
@@ -145,7 +176,7 @@ const HotelHomeScreen = () => {
               <Text style={styles.hotelDescription}>{hotel.type}</Text>
               <Text style={styles.hotelDescription}>City: {hotel.city}</Text>
               <Text style={styles.hotelAvgRating}>
-                Rating: {hotel.rating.toFixed(1)} ☆ ({hotel.reviewsCount} reviews)
+                Rating: {hotel.rating ? hotel.rating.toFixed(1) : 'N/A'} ☆ ({hotel.reviewsCount || 0} reviews)
               </Text>
               <Text style={styles.hotelNumRatings}>Price: {hotel.price.total} {hotel.price.currency}</Text>
             </View>
