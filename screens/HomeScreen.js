@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, Image, ScrollView, Linking } from 'react-native';
 import { firestore } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import * as Location from 'expo-location';
+
+
 
 const HotelHomeScreen = () => {
   const navigation = useNavigation();
@@ -102,17 +104,24 @@ const HotelHomeScreen = () => {
   const searchHotelsByCity = async (cityName) => {
     console.log('Location:', cityName);
     try {
+
+      const currentDate = new Date();//Aktuelles Datum holen
+      const checkinDate = currentDate.toISOString().split("T")[0];
+      const checkoutDate = new Date(currentDate);
+      checkoutDate.setDate(currentDate.getDate() + 1);
+      const checkoutDateString = checkoutDate.toISOString().split("T")[0];
+
       const response = await axios.get('https://airbnb13.p.rapidapi.com/search-location', {
         params: {
           location: cityName,
-          checkin: '2024-01-20',
-          checkout: '2024-01-21',
+          checkin: checkinDate,
+          checkout: checkoutDateString,
           adults: '1',
           children: '0',
           infants: '0',
           pets: '0',
           page: '1',
-          currency: 'USD',
+          currency: 'EUR',
         },
         headers: {
           'X-RapidAPI-Key': '9f6d09997bmshdbfa2e4e394ffb8p1c3f84jsn92a0930ce2d4',
@@ -142,6 +151,12 @@ const HotelHomeScreen = () => {
     navigation.navigate('MainMenu');
   };
 
+  const openAirbnbUrl = (url) => {
+    Linking.openURL(url)
+      .then(() => console.log("Url geöffnet"))
+      .catch((error) => console.error("Fehler beim Öffnen der URL:",error))
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
@@ -164,12 +179,13 @@ const HotelHomeScreen = () => {
   
       <ScrollView style={styles.hotelList}>
         
-        {filteredHotels.map((hotel) => (
+        {filteredHotels && filteredHotels.map((hotel) => (
           <TouchableOpacity
             key={hotel.id}
             style={styles.hotelContainer}
             onPress={() => navigateToDetails(hotel)}
           >
+            
             <Image source={{ uri: hotel.images[0] }} style={styles.hotelImage} />
             <View style={styles.hotelInfo}>
               <Text style={styles.hotelName}>{hotel.name}</Text>
@@ -179,6 +195,12 @@ const HotelHomeScreen = () => {
                 Rating: {hotel.rating ? hotel.rating.toFixed(1) : 'N/A'} ☆ ({hotel.reviewsCount || 0} reviews)
               </Text>
               <Text style={styles.hotelNumRatings}>Price: {hotel.price.total} {hotel.price.currency}</Text>
+            </View>
+            <View style={styles.hotelContent}>
+              <TouchableOpacity onPress={() => openAirbnbUrl(hotel.url)} style={styles.viewButton}>
+              <Icon name="globe" size={20} color="blue" />
+              </TouchableOpacity>
+                
             </View>
           </TouchableOpacity>
         ))}
@@ -190,11 +212,24 @@ const HotelHomeScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-        }  
+  );}
+    
 export default HotelHomeScreen;
 
 const styles = StyleSheet.create({
+
+  hotelContent:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  viewButton:{
+    marginLeft: "auto",
+    marginRight: 10,
+    alignItems: "center",
+  },
+
   container: {
     flex: 1,
     backgroundColor: 'white',
