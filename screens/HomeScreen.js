@@ -212,8 +212,8 @@ const HotelHomeScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  );}
-    
+  );
+}  
 export default HotelHomeScreen;
 
 const styles = StyleSheet.create({
