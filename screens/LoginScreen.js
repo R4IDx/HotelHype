@@ -60,6 +60,15 @@ const LoginScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200}
     >
+    <View style={styles.logoContainer}>
+                <Image
+                    source={require('../logo/Logo1.jpg')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
+            </View>  
+    
+    
 
       <View style={styles.inputContainer}>
         <TextInput
@@ -153,6 +162,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
+
+  logoContainer: {
+    marginTop: 20, // Abstand über dem Home-Button
+},
+logo: {
+    width: 250, // Breite des Logos (anpassen nach Bedarf)
+    height: 250, // Höhe des Logos (anpassen nach Bedarf)
+},
 });
 
 export default LoginScreen;
