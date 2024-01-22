@@ -151,6 +151,8 @@ const HotelHomeScreen = () => {
     }
   };
 
+  const [searchInput, setSearchInput] = useState("");
+
   const handleMapPress = () => {
     navigation.navigate("Map");
   }; 
@@ -161,6 +163,14 @@ const HotelHomeScreen = () => {
   const navigateToMainMenu = () => {
     navigation.navigate('MainMenu');
   };
+
+  const handleSearchInputChange = (text) => {
+    setSearchInput(text);
+  };
+
+  const handleSearchbar = () => {
+    searchHotelsByCity(searchInput);
+  }
 
   const openAirbnbUrl = (url) => {
     Linking.openURL(url)
@@ -182,11 +192,21 @@ const HotelHomeScreen = () => {
           <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>Main Menu</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleSearch} style={styles.menuButton}>
-          <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>
-            Show Hotels
-          </Text>
+        <Icon name="hotel" size={20} color="white"/>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.searchBarContainer}>
+  <TextInput
+    style={styles.searchBar}
+    placeholder="Center City"
+    onChangeText={handleSearchInputChange}
+  />
+
+  <TouchableOpacity onPress={() => handleSearchbar(searchInput)} style={styles.searchButton}>
+    <Icon name="arrow-right" size={20} color="white" />
+  </TouchableOpacity>
+  </View>
   
       <ScrollView style={styles.hotelList}>
         
@@ -229,6 +249,30 @@ export default HotelHomeScreen;
 
 const styles = StyleSheet.create({
 
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    backgroundColor: 'blue',
+    height: 70,
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginRight: 20,
+  },
+  additionalIcon: {
+    padding: 10,
+    marginRight: 15,
+  },
+
+
+
+
   hotelContent:{
     flexDirection: "row",
     justifyContent: "space-between",
@@ -264,27 +308,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'blue',
     height: 70,
   },
-  filterButton: {
-    padding: 10,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    paddingHorizontal: 10,
-  },
-    searchInput: {
-      flex: 1,
-      height: 40,
-      color: 'black',
-    },
-    searchIcon: {
-      marginRight: 10,
-    },
+  
+
+
     hotelList: {
       flex: 1,
       padding: 15,
@@ -322,13 +348,8 @@ const styles = StyleSheet.create({
     hotelNumRatings: {
       color: 'blue', // Ändern Sie die Textfarbe entsprechend
     },
-    searchResultsText: {
-      textAlign: 'center',
-      marginTop: 20,
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: 'blue', // Ändern Sie die Textfarbe entsprechend
-    },
+    
+    
     bottomMenu: {
       flexDirection: 'row',
       justifyContent: 'space-around',
