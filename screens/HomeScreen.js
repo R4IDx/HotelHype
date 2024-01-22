@@ -44,8 +44,8 @@ const HotelHomeScreen = () => {
         setLocation(currentLocation.coords);
 
         // Hier den Städtenamen abrufen
-        const cityName = await getCityName(currentLocation.coords.latitude, currentLocation.coords.longitude);
-        setCity(cityName);
+        //const cityName = await getCityName(currentLocation.coords.latitude, currentLocation.coords.longitude);
+        //setCity(cityName);
       } catch (error) {
         console.error('Error getting location:', error);
       }
@@ -136,8 +136,19 @@ const HotelHomeScreen = () => {
     }
   };
 
-  const handleSearch = () => {
-    searchHotelsByCity(filter);
+  const handleSearch = async () => {
+    try {
+      await sendLocation();  // Warte auf die Standortbestimmung
+      if (location) {
+        const cityName = await getCityName(location.latitude, location.longitude);
+        setCity(cityName);
+        searchHotelsByCity(filter);
+      } else {
+        console.warn('Standort nicht verfügbar');
+      }
+    } catch (error) {
+      console.error('Fehler beim Suchen von Hotels:', error);
+    }
   };
 
   const handleMapPress = () => {
@@ -170,7 +181,7 @@ const HotelHomeScreen = () => {
         <TouchableOpacity onPress={navigateToMainMenu} style={styles.menuButton}>
           <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>Main Menu</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={sendLocation} style={styles.menuButton}>
+        <TouchableOpacity onPress={handleSearch} style={styles.menuButton}>
           <Text style={[styles.buttonText, { fontSize: 18, color: 'white' }]}>
             Show Hotels
           </Text>
