@@ -126,7 +126,7 @@ const HotelHomeScreen = () => {
           currency: 'EUR',
         },
         headers: {
-          'X-RapidAPI-Key': '9f6d09997bmshdbfa2e4e394ffb8p1c3f84jsn92a0930ce2d4',
+          'X-RapidAPI-Key': 'e417195824mshbf64622a0ee07d6p195231jsn34173e162a06',
           'X-RapidAPI-Host': 'airbnb13.p.rapidapi.com',
         },
       });
@@ -154,9 +154,7 @@ const HotelHomeScreen = () => {
   };
 
   
-  const sortHotels = () => {
-    console.log('Vor der Sortierung - sortType:', sortType);
-    console.log('Vor der Sortierung - filteredHotels:', filteredHotels);
+  const sortHotels = (sortType) => {
 
     if (filteredHotels && filteredHotels.length > 0) {
       let sortedHotels = [...filteredHotels]; // Erstelle eine Kopie der Hotels zum Sortieren
@@ -171,72 +169,59 @@ const HotelHomeScreen = () => {
         sortedHotels = sortedHotels.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       }
 
-      console.log('Nach der Sortierung - sortType:', sortType);
-      console.log('Nach der Sortierung - sortedHotels:', sortedHotels);
-
       setFilteredHotels(sortedHotels); // Setze die sortierten Hotels
     }
   };
 
-  useEffect(() => {
-  }, [sortType, filteredHotels]);
-
   const handleSortChange = (sortType) => {
     console.log('Sortierung geändert:', sortType);
     setSortType(sortType);
-    sortHotels();
+    sortHotels(sortType);
   };
 
 
 
 
 
-const SortingDropdown = ({ modalVisible, onSortChange }) => {
-  const [sortMenuVisible, setSortMenuVisible] = useState(false);
-
-  const handleSortPress = (sortType) => {
-    setSortMenuVisible(false);
-    onSortChange(sortType);
-  };
-
-  useEffect(() => {
-    setSortMenuVisible(modalVisible);
-  }, [modalVisible]);
-
-  return (
-    <>
-      {modalVisible && (
-        <Modal
-          transparent={true}
-          animationType="slide"
-          visible={sortMenuVisible}
-          onRequestClose={() => setSortMenuVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <TouchableOpacity onPress={() => handleSortPress('priceAsc')} style={styles.sortOption}>
-                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white'}]}>Preis aufsteigend</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleSortPress('priceDesc')} style={styles.sortOption}>
-                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Preis absteigend</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleSortPress('ratingAsc')} style={styles.sortOption}>
-                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung aufsteigend</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleSortPress('ratingDesc')} style={styles.sortOption}>
-                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung absteigend</Text>
-              </TouchableOpacity>
+  const SortingDropdown = ({ isVisible, onSortChange }) => {
+    const [sortMenuVisible, setSortMenuVisible] = useState();
+    const handleSortPress = (sortType) => {
+      setModalVisible(false);
+      onSortChange(sortType);
+    };
+    
+    return (
+      <>
+        {isVisible && (
+          <Modal
+            transparent={true}
+            animationType="slide"
+            visible={isVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableOpacity onPress={() => handleSortPress('priceAsc')} style={styles.sortOption}>
+                  <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white'}]}>Preis aufsteigend</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleSortPress('priceDesc')} style={styles.sortOption}>
+                  <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Preis absteigend</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleSortPress('ratingAsc')} style={styles.sortOption}>
+                  <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung aufsteigend</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleSortPress('ratingDesc')} style={styles.sortOption}>
+                  <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung absteigend</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
-      )}
-    </>
-  );
-};
-
-  const handleSortPress = () => {
-    setModalVisible(!modalVisible);
+          </Modal>
+        )}
+      </>
+    );
   };
+
+  
 
 
   const handleMapPress = () => {
@@ -327,10 +312,10 @@ const SortingDropdown = ({ modalVisible, onSortChange }) => {
         <TouchableOpacity style={styles.reservationButton} onPress={handleMapPress}>
           <Icon name="map" size={20} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.reservationButton} onPress={handleSortPress}>
+        <TouchableOpacity style={styles.reservationButton} onPress={() => setModalVisible(!modalVisible)}>
           <Icon name="sort" size={20} color="white" />
         </TouchableOpacity>
-        <SortingDropdown modalVisible={modalVisible} onSortChange={handleSortChange} />
+        <SortingDropdown isVisible={modalVisible} onSortChange={handleSortChange} />
       </View>
     </View>
   );
