@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import * as Location from 'expo-location';
+import Modal from "react-native-modal";
 
 
 
@@ -15,6 +16,10 @@ const HotelHomeScreen = () => {
   const [filteredHotels, setFilteredHotels] = useState([]);
   const [location, setLocation] = useState(null);
   const [city, setCity] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [sortType, setSortType] = useState(null);
+
 
   useEffect(() => {
     const unsubscribe = firestore.collection('hotels').onSnapshot((snapshot) => {
@@ -43,9 +48,6 @@ const HotelHomeScreen = () => {
         const currentLocation = await Location.getCurrentPositionAsync({});
         setLocation(currentLocation.coords);
 
-        // Hier den Städtenamen abrufen
-        //const cityName = await getCityName(currentLocation.coords.latitude, currentLocation.coords.longitude);
-        //setCity(cityName);
       } catch (error) {
         console.error('Error getting location:', error);
       }
@@ -151,7 +153,91 @@ const HotelHomeScreen = () => {
     }
   };
 
-  const [searchInput, setSearchInput] = useState("");
+  
+  const sortHotels = () => {
+    console.log('Vor der Sortierung - sortType:', sortType);
+    console.log('Vor der Sortierung - filteredHotels:', filteredHotels);
+
+    if (filteredHotels && filteredHotels.length > 0) {
+      let sortedHotels = [...filteredHotels]; // Erstelle eine Kopie der Hotels zum Sortieren
+
+      if (sortType === 'priceAsc') {
+        sortedHotels = sortedHotels.sort((a, b) => a.price.total - b.price.total);
+      } else if (sortType === 'priceDesc') {
+        sortedHotels = sortedHotels.sort((a, b) => b.price.total - a.price.total);
+      } else if (sortType === 'ratingAsc') {
+        sortedHotels = sortedHotels.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+      } else if (sortType === 'ratingDesc') {
+        sortedHotels = sortedHotels.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      }
+
+      console.log('Nach der Sortierung - sortType:', sortType);
+      console.log('Nach der Sortierung - sortedHotels:', sortedHotels);
+
+      setFilteredHotels(sortedHotels); // Setze die sortierten Hotels
+    }
+  };
+
+  useEffect(() => {
+  }, [sortType, filteredHotels]);
+
+  const handleSortChange = (sortType) => {
+    console.log('Sortierung geändert:', sortType);
+    setSortType(sortType);
+    sortHotels();
+  };
+
+
+
+
+
+const SortingDropdown = ({ modalVisible, onSortChange }) => {
+  const [sortMenuVisible, setSortMenuVisible] = useState(false);
+
+  const handleSortPress = (sortType) => {
+    setSortMenuVisible(false);
+    onSortChange(sortType);
+  };
+
+  useEffect(() => {
+    setSortMenuVisible(modalVisible);
+  }, [modalVisible]);
+
+  return (
+    <>
+      {modalVisible && (
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={sortMenuVisible}
+          onRequestClose={() => setSortMenuVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity onPress={() => handleSortPress('priceAsc')} style={styles.sortOption}>
+                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white'}]}>Preis aufsteigend</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSortPress('priceDesc')} style={styles.sortOption}>
+                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Preis absteigend</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSortPress('ratingAsc')} style={styles.sortOption}>
+                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung aufsteigend</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSortPress('ratingDesc')} style={styles.sortOption}>
+                <Text style={[styles.sortOptionText, { fontSize: 18, color: 'white' }]}>Bewertung absteigend</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+    </>
+  );
+};
+
+  const handleSortPress = () => {
+    setModalVisible(!modalVisible);
+  };
+
 
   const handleMapPress = () => {
     navigation.navigate("Map");
@@ -241,13 +327,36 @@ const HotelHomeScreen = () => {
         <TouchableOpacity style={styles.reservationButton} onPress={handleMapPress}>
           <Icon name="map" size={20} color="white" />
         </TouchableOpacity>
+        <TouchableOpacity style={styles.reservationButton} onPress={handleSortPress}>
+          <Icon name="sort" size={20} color="white" />
+        </TouchableOpacity>
+        <SortingDropdown modalVisible={modalVisible} onSortChange={handleSortChange} />
       </View>
     </View>
   );
 }  
-export default HotelHomeScreen;
+
 
 const styles = StyleSheet.create({
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'blue',
+    padding: 20,
+    borderRadius: 10,
+  },
+  sortOption: {
+    paddingVertical: 10,
+  },
+  sortOptionText: {
+    fontSize: 16,
+    color: 'blue',
+    marginBottom: 10,
+  },
 
   searchBarContainer: {
     flexDirection: 'row',
@@ -269,9 +378,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 15,
   },
-
-
-
 
   hotelContent:{
     flexDirection: "row",
@@ -308,8 +414,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'blue',
     height: 70,
   },
-  
-
 
     hotelList: {
       flex: 1,
@@ -335,18 +439,18 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       fontSize: 16,
       marginBottom: 5,
-      color: 'blue', // Ändern Sie die Textfarbe entsprechend
+      color: 'blue', 
     },
     hotelDescription: {
       marginBottom: 5,
-      color: 'blue', // Ändern Sie die Textfarbe entsprechend
+      color: 'blue', 
     },
     hotelAvgRating: {
       marginBottom: 5,
-      color: 'blue', // Ändern Sie die Textfarbe entsprechend
+      color: 'blue', 
     },
     hotelNumRatings: {
-      color: 'blue', // Ändern Sie die Textfarbe entsprechend
+      color: 'blue', 
     },
     
     
@@ -354,12 +458,11 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-around',
       alignItems: 'center',
-      paddingVertical: 10,
+      paddingVertical: 15,
       borderTopWidth: 1,
       borderTopColor: '#E0E0E0',
       backgroundColor: 'blue',
     },
-    reservationButton: {
-      padding: 10,
-    },
+    
   });
+export default HotelHomeScreen;

@@ -25,6 +25,7 @@
     "react-leaflet": "^4.2.1",
     "react-native": "0.72.6",
     "react-native-maps": "^1.7.1",
+    "react-native-modal": "^13.0.1",
     "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
