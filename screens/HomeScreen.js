@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import * as Location from 'expo-location';
 import Modal from "react-native-modal";
+import * as appconfig from "../config/secrets";
 
 
 
@@ -126,7 +127,7 @@ const HotelHomeScreen = () => {
           currency: 'EUR',
         },
         headers: {
-          'X-RapidAPI-Key': 'e417195824mshbf64622a0ee07d6p195231jsn34173e162a06',
+          'X-RapidAPI-Key': appconfig.AIRBNB_API_KEY,
           'X-RapidAPI-Host': 'airbnb13.p.rapidapi.com',
         },
       });

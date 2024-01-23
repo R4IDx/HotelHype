@@ -1,11 +1,11 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-
+import * as appconfig from "./config/secrets"
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD2sxx6vlDMpGKI8KMLRI6uLIH-BIud58s",
+  apiKey: appconfig.FIREBASE_API_KEY,
   authDomain: "hotelcheckmoco.firebaseapp.com",
   projectId: "hotelcheckmoco",
   storageBucket: "hotelcheckmoco.appspot.com",
